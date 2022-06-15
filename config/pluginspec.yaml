@@ -23,6 +23,12 @@ procedures:
     required: true
     type: entry
     label: Service Name
+  -
+    name: argString
+    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /start=auto\n/binpath=C:\temp\n/'
+    required: false
+    type: textarea
+    label: Extra Arguments
 -
   name: 'Check If Service Exists'
   description: 'Checks to see if one or more Windows services exists.'
@@ -51,7 +57,7 @@ procedures:
     label: Service Names
   -
     name: argString
-    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /error= severe\n/binpath= C:\temp\n'
+    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /start=auto\n/binpath=C:\temp\n/'
     required: false
     type: textarea
     label: Extra Arguments
@@ -123,7 +129,7 @@ procedures:
     label: Service Names
   -
     name: argString
-    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /error= severe\n/binpath= C:\temp\n'
+    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /start=auto\n/binpath=C:\temp\n/'
     required: true
     type: textarea
     label: Extra Arguments
