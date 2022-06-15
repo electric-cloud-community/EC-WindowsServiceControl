@@ -23,7 +23,7 @@ class StartServiceParameters {
 
         def serviceNames = sp.getRequiredParameter('serviceNames').value
         parameters.serviceNames = serviceNames
-        def argString = sp.getRequiredParameter('argString').value
+        def argString = sp.getParameter('argString').value
         parameters.argString = argString
         def waitFor = sp.getParameter('waitFor').value == "true"
         parameters.waitFor = waitFor
@@ -31,4 +31,4 @@ class StartServiceParameters {
         return parameters
     }
 }
-// DO NOT EDIT THIS BLOCK ABOVE ^^^=== Parameters ends, checksum: 021c7a9012bff314ca9d7b1208e7f68d ===
+// DO NOT EDIT THIS BLOCK ABOVE ^^^=== Parameters ends, checksum: 24ac97e07fbbecb55a19824e0adcc594 ===

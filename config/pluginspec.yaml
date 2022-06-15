@@ -130,13 +130,13 @@ procedures:
   -
     name: argString
     documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /start=auto\n/binpath=C:\temp\n/'
-    required: true
+    required: false
     type: textarea
     label: Extra Arguments
   -
     name: waitFor
     documentation: "Select this to have the step wait for the service to be running."
-    required: true
+    required: false
     type: checkbox
     value: true
     label: Wait for Started

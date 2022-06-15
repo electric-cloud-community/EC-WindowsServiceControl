@@ -9,14 +9,20 @@ class CreateServiceParameters {
     * Label: Service Name, type: entry
     */
     String serviceName
+    /**
+    * Label: Extra Arguments, type: textarea
+    */
+    String argString
 
     static CreateServiceParameters initParameters(StepParameters sp) {
         CreateServiceParameters parameters = new CreateServiceParameters()
 
         def serviceName = sp.getRequiredParameter('serviceName').value
         parameters.serviceName = serviceName
+        def argString = sp.getParameter('argString').value
+        parameters.argString = argString
 
         return parameters
     }
 }
-// DO NOT EDIT THIS BLOCK ABOVE ^^^=== Parameters ends, checksum: 7cc69c72a1a195d6ff94766dac185d74 ===
+// DO NOT EDIT THIS BLOCK ABOVE ^^^=== Parameters ends, checksum: 3dadb87cca0b3f3a6884f1df4998f831 ===

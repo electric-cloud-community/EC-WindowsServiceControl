@@ -20,6 +20,7 @@ class WindowsServiceControl extends FlowPlugin {
     * createService - Create Service/Create Service
     * Add your code into this method and it will be called when the step runs
     * @param serviceName (required: true)
+    * @param argString (required: false)
     
     */
     def createService(StepParameters p, StepResult sr) {
@@ -28,6 +29,7 @@ class WindowsServiceControl extends FlowPlugin {
 
         // Calling logger:
         log.info p.asMap.get('serviceName')
+        log.info p.asMap.get('argString')
         
 
         // Setting job step summary to the config name
@@ -138,8 +140,8 @@ class WindowsServiceControl extends FlowPlugin {
     * startService - Start Service/Start Service
     * Add your code into this method and it will be called when the step runs
     * @param serviceNames (required: true)
-    * @param argString (required: true)
-    * @param waitFor (required: true)
+    * @param argString (required: false)
+    * @param waitFor (required: false)
     
     */
     def startService(StepParameters p, StepResult sr) {
