@@ -1,0 +1,175 @@
+pluginInfo:
+  # This is default sample specification
+  # Feel free to change it
+  # Call pdk showdoc pluginspec to see the list of available fields and their description
+  pluginName: 'EC-WindowsServiceControl'
+  version: '1.0.0'
+  description: 'This plugin manipulates Windows Services'
+  author: 'Shaohua Wen swen@cloudbees.com'
+  supportUrl: 'none'
+  category: 'System'
+  shell: 'ec-groovy'
+
+procedures:
+-
+  name: 'Create Service'
+  description: 'Create a Service.'
+  # configuration field will be generated automatically
+  hasConfig: false
+  parameters:
+  -
+    name: serviceName
+    documentation: 'The name of the service to be created.'
+    required: true
+    type: entry
+    label: Service Name
+-
+  name: 'Check If Service Exists'
+  description: 'Checks to see if one or more Windows services exists.'
+  # configuration field will be generated automatically
+  hasConfig: false
+  parameters:
+  -
+    name: serviceNames
+    documentation: "A comma-separated list of Windows services to check for."
+    required: true
+    type: entry
+    label: Service Names
+  outputParameters:
+    serviceExists: 'check result with value true or false'
+-
+  name: 'Delete Service'
+  description: 'Delete one or more Windows services.'
+  # configuration field will be generated automatically
+  hasConfig: false
+  parameters:
+  -
+    name: serviceNames
+    documentation: 'A comma-separated list of Windows services to be deleted.'
+    required: true
+    type: entry
+    label: Service Names
+  -
+    name: argString
+    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /error= severe\n/binpath= C:\temp\n'
+    required: false
+    type: textarea
+    label: Extra Arguments
+-
+  name: 'Disable Service'
+  description: 'Disable one or more Windows services.'
+  # configuration field will be generated automatically
+  hasConfig: false
+  parameters:
+  -
+    name: serviceNames
+    documentation: "A comma-separated list of Windows services to be disabled."
+    required: true
+    type: entry
+    label: Service Names
+  -
+    name: argString
+    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /error= severe\n/binpath= C:\temp\n'
+    required: false
+    type: textarea
+    label: Extra Arguments
+-
+  name: 'Enable Service'
+  description: 'Enable one or more Windows services.'
+  # configuration field will be generated automatically
+  hasConfig: false
+  parameters:
+  -
+    name: serviceNames
+    documentation: Enable one or more Windows services.
+    required: true
+    type: entry
+    label: Service Names
+  -
+    name: argString
+    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /error= severe\n/binpath= C:\temp\n'
+    required: false
+    type: textarea
+    label: Extra Arguments
+  -
+    name: startType
+    documentation: service start type
+    required: true
+    type: select
+    options:
+      - name: boot
+        value: boot
+      - name: system
+        value: system
+      - name: auto
+        value: auto
+      - name: demand
+        value: demand
+      - name: delayed-auto
+        value: delayed-auto
+    value: 'auto'
+    label: Start Type
+-
+  name: 'Start Service'
+  description: 'Start one or more Windows services.'
+  # configuration field will be generated automatically
+  hasConfig: false
+  parameters:
+  -
+    name: serviceNames
+    documentation: A comma-separated list of Windows services to be started.
+    required: true
+    type: entry
+    label: Service Names
+  -
+    name: argString
+    documentation: 'A newline separated list of arguments to be added to the sc.exe call. e.g. /error= severe\n/binpath= C:\temp\n'
+    required: true
+    type: textarea
+    label: Extra Arguments
+  -
+    name: waitFor
+    documentation: "Select this to have the step wait for the service to be running."
+    required: true
+    type: checkbox
+    value: true
+    label: Wait for Started
+-
+  name: 'Stop Service'
+  description: 'Stop one or more Windows services.'
+  # configuration field will be generated automatically
+  hasConfig: false
+  parameters:
+  -
+    name: serviceNames
+    documentation: 'A comma-separated list of Windows services to be stopped.'
+    required: true
+    type: entry
+    label: Service Names
+  -
+    name: waitFor
+    documentation: "Select this to have the step wait for the service to be stopped."
+    required: false
+    type: checkbox
+    value: true
+    label: Wait for Stopped
+  -
+    name: timeout
+    documentation: 'If this value is set, the step will terminate the service after the set time. Time is in milliseconds'
+    required: false
+    type: entry
+    label: Set Timeout
+-
+  name: 'Check Service Status'
+  description: 'Gets the status of one or more Windows services.'
+  # configuration field will be generated automatically
+  hasConfig: false
+  parameters:
+  -
+    name: serviceNames
+    documentation: 'A comma-separated list of Windows services to check for.'
+    required: true
+    type: entry
+    label: Service Names
+  outputParameters:
+    serviceStatus: 'check result with status'

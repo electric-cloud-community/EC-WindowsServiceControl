@@ -1,0 +1,9 @@
+.DS_Store
+.gradle/
+.idea/
+.assets/
+build/
+bin/
+specs/logs
+specs/spec-report
+*.bak
