@@ -70,13 +70,13 @@ class WindowsServiceControl extends FlowPlugin {
                 'query',
                 serviceName
             ] as ArrayList<String>)
-            log.info "Command to run is " + command.renderCommand().command().join(' ')
+            log.info "\nCommand to run is " + command.renderCommand().command().join(' ')
 
             /** ExecutsetJobStepSummarying the command */
             ExecutionResult result = cli.runCommand(command)
 
-            log.debug "stdout: " + result.getStdOut()
-            log.debug "stderr: " + result.getStdErr()
+            log.info "stdout: " + result.getStdOut()
+            log.info "stderr: " + result.getStdErr()
             if(!result.isSuccess()) {
                 failed = true
                 summaryMessage += "Service '" + serviceName + "' does not exist\n"
