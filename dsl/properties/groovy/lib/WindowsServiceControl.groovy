@@ -1,4 +1,6 @@
 import com.cloudbees.flowpdf.*
+import com.cloudbees.flowpdf.components.ComponentManager
+import com.cloudbees.flowpdf.components.cli.*
 
 /**
 * WindowsServiceControl
@@ -52,12 +54,43 @@ class WindowsServiceControl extends FlowPlugin {
 
         // Calling logger:
         log.info p.asMap.get('serviceNames')
-        
 
-        // Setting job step summary to the config name
-        sr.setJobStepSummary(p.getParameter('config')?.getValue() ?: 'null')
+        String serviceNames =  p.asMap.get('serviceNames')
+        String[] serviceNamesList = serviceNames.split(',')
+        String executableName = 'sc.exe'
+        String workspaceDir = System.getProperty('user.dir')
+        /** Instantiating CLI component with a ComponentManager */
+        CLI cli = (CLI) ComponentManager.loadComponent(CLI.class, [workingDirectory: workspaceDir], this)
 
-        sr.setReportUrl("Sample Report", 'https://cloudbees.com')
+        def failed = false
+        def summaryMessage = ''
+        /** Creating a Command instance */
+        for( String  serviceName : serviceNamesList){
+            Command command = cli.newCommand(executableName, [
+                'query',
+                serviceName
+            ] as ArrayList<String>)
+            log.info "Command to run is " + command.renderCommand().command().join(' ')
+
+            /** ExecutsetJobStepSummarying the command */
+            ExecutionResult result = cli.runCommand(command)
+
+            log.debug "stdout: " + result.getStdOut()
+            log.debug "stderr: " + result.getStdErr()
+            if(!result.isSuccess()) {
+                failed = true
+                summaryMessage += "Service '" + serviceName + "' does not exist\n"
+            } else {
+                summaryMessage += "Service '" + serviceName + "' exists\n"
+            }
+        }
+
+        // Setting job step summary
+        sr.setJobStepSummary(summaryMessage)
+
+        if(failed) {
+            sr.setJobStepOutcome('error')
+        }
         sr.apply()
         log.info("step Check If Service Exists has been finished")
     }
@@ -201,7 +234,6 @@ class WindowsServiceControl extends FlowPlugin {
         // Calling logger:
         log.info p.asMap.get('serviceNames')
         
-
         // Setting job step summary to the config name
         sr.setJobStepSummary(p.getParameter('config')?.getValue() ?: 'null')
 
