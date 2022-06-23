@@ -32,12 +32,24 @@ class WindowsServiceControl extends FlowPlugin {
         // Calling logger:
         log.info p.asMap.get('serviceName')
         log.info p.asMap.get('argString')
-        
+        def argString = p.asMap.get('argString')
+        def argStrings = (argString?argString.split('\n'):null)
+        def serviceName = p.asMap.get('serviceName')
+        def summaryMessage = "Service '" + serviceName + "' created successfully.\n"
+        def args = ['create', serviceName]
+        if(argStrings){
+            args.addAll(argStrings)
+        }
+        ExecutionResult result = runSCCommand(args)
 
         // Setting job step summary to the config name
-        sr.setJobStepSummary(p.getParameter('config')?.getValue() ?: 'null')
+        if(!result.isSuccess()) {
+            summaryMessage = "Failed to create service '" + serviceName + "'.\n"
+            sr.setJobStepOutcome('error')
+        }
 
-        sr.setReportUrl("Sample Report", 'https://cloudbees.com')
+        sr.setJobStepSummary(summaryMessage)
+
         sr.apply()
         log.info("step Create Service has been finished")
     }
@@ -251,6 +263,7 @@ class WindowsServiceControl extends FlowPlugin {
 
         log.info "stdout: " + result.getStdOut()
         log.info "stderr: " + result.getStdErr()
+        log.info "return code: " + result.getCode()
         return result
     }
 
