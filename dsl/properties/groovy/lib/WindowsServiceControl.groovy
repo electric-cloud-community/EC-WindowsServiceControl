@@ -71,7 +71,7 @@ class WindowsServiceControl extends FlowPlugin {
         String[] serviceNamesList = serviceNames.split(',')
         def failed = false
         def summaryMessage = ''
-        /** Creating a Command instance */
+
         for( String  serviceName : serviceNamesList){
             ExecutionResult result = runSCCommand([
                 'query',
@@ -109,12 +109,36 @@ class WindowsServiceControl extends FlowPlugin {
         // Calling logger:
         log.info p.asMap.get('serviceNames')
         log.info p.asMap.get('argString')
-        
 
-        // Setting job step summary to the config name
-        sr.setJobStepSummary(p.getParameter('config')?.getValue() ?: 'null')
+        def argString = p.asMap.get('argString')
+        def argStrings = (argString?argString.split('\n'):null)
 
-        sr.setReportUrl("Sample Report", 'https://cloudbees.com')
+        String serviceNames =  p.asMap.get('serviceNames')
+        String[] serviceNamesList = serviceNames.split(',')
+
+        def failed = false
+        def summaryMessage = ''
+
+        for( String  serviceName : serviceNamesList){
+            def args = ['delete', serviceName]
+            if(argStrings){
+                args.addAll(argStrings)
+            }
+            ExecutionResult result = runSCCommand(args)
+            if(!result.isSuccess()) {
+                failed = true
+                summaryMessage += "Cannot delete service '" + serviceName + "'\n"
+            } else {
+                summaryMessage += "Service '" + serviceName + "' deleted.\n"
+            }
+        }
+
+        // Setting job step summary
+        sr.setJobStepSummary(summaryMessage)
+
+        if(failed) {
+            sr.setJobStepOutcome('error')
+        }
         sr.apply()
         log.info("step Delete Service has been finished")
     }
