@@ -57,26 +57,14 @@ class WindowsServiceControl extends FlowPlugin {
 
         String serviceNames =  p.asMap.get('serviceNames')
         String[] serviceNamesList = serviceNames.split(',')
-        String executableName = 'sc.exe'
-        String workspaceDir = System.getProperty('user.dir')
-        /** Instantiating CLI component with a ComponentManager */
-        CLI cli = (CLI) ComponentManager.loadComponent(CLI.class, [workingDirectory: workspaceDir], this)
-
         def failed = false
         def summaryMessage = ''
         /** Creating a Command instance */
         for( String  serviceName : serviceNamesList){
-            Command command = cli.newCommand(executableName, [
+            ExecutionResult result = runSCCommand([
                 'query',
                 serviceName
-            ] as ArrayList<String>)
-            log.info "\nCommand to run is " + command.renderCommand().command().join(' ')
-
-            /** ExecutsetJobStepSummarying the command */
-            ExecutionResult result = cli.runCommand(command)
-
-            log.info "stdout: " + result.getStdOut()
-            log.info "stderr: " + result.getStdErr()
+            ])
             if(!result.isSuccess()) {
                 failed = true
                 summaryMessage += "Service '" + serviceName + "' does not exist\n"
@@ -243,5 +231,27 @@ class WindowsServiceControl extends FlowPlugin {
     }
 
 // === step ends ===
+    /**
+        * runSCCommand - Run SC Command/Run SC Command
+        * @param args (required: true)
+
+    */
+    def runSCCommand(def args){
+        String executableName = 'sc.exe'
+        String workspaceDir = System.getProperty('user.dir')
+        /** Instantiating CLI component with a ComponentManager */
+        CLI cli = (CLI) ComponentManager.loadComponent(CLI.class, [workingDirectory: workspaceDir], this)
+
+        /** Creating a Command instance */
+        Command command = cli.newCommand(executableName, args as ArrayList<String>)
+        log.info "\nCommand to run is " + command.renderCommand().command().join(' ')
+
+        /** ExecutsetJobStepSummarying the command */
+        ExecutionResult result = cli.runCommand(command)
+
+        log.info "stdout: " + result.getStdOut()
+        log.info "stderr: " + result.getStdErr()
+        return result
+    }
 
 }
