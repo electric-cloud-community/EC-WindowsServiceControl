@@ -157,12 +157,37 @@ class WindowsServiceControl extends FlowPlugin {
         // Calling logger:
         log.info p.asMap.get('serviceNames')
         log.info p.asMap.get('argString')
-        
 
-        // Setting job step summary to the config name
-        sr.setJobStepSummary(p.getParameter('config')?.getValue() ?: 'null')
+        def argString = p.asMap.get('argString')
+        def argStrings = (argString?argString.split('\n'):null)
 
-        sr.setReportUrl("Sample Report", 'https://cloudbees.com')
+        String serviceNames =  p.asMap.get('serviceNames')
+        String[] serviceNamesList = serviceNames.split(',')
+
+        def failed = false
+        def summaryMessage = ''
+
+        for( String  serviceName : serviceNamesList){
+            def args = ['config', serviceName, "start=", "disabled"]
+            if(argStrings){
+                args.addAll(argStrings)
+            }
+            ExecutionResult result = runSCCommand(args)
+            if(!result.isSuccess()) {
+                failed = true
+                summaryMessage += "Cannot disable service '" + serviceName + "'\n"
+            } else {
+                summaryMessage += "Service '" + serviceName + "' disabled.\n"
+            }
+        }
+
+        // Setting job step summary
+        sr.setJobStepSummary(summaryMessage)
+
+        if(failed) {
+            sr.setJobStepOutcome('error')
+        }
+
         sr.apply()
         log.info("step Disable Service has been finished")
     }
@@ -183,12 +208,38 @@ class WindowsServiceControl extends FlowPlugin {
         log.info p.asMap.get('serviceNames')
         log.info p.asMap.get('argString')
         log.info p.asMap.get('startType')
-        
 
-        // Setting job step summary to the config name
-        sr.setJobStepSummary(p.getParameter('config')?.getValue() ?: 'null')
+        def startType = p.asMap.get('startType')
+        def argString = p.asMap.get('argString')
+        def argStrings = (argString?argString.split('\n'):null)
 
-        sr.setReportUrl("Sample Report", 'https://cloudbees.com')
+        String serviceNames =  p.asMap.get('serviceNames')
+        String[] serviceNamesList = serviceNames.split(',')
+
+        def failed = false
+        def summaryMessage = ''
+
+        for( String  serviceName : serviceNamesList){
+            def args = ['config', serviceName, "start=", startType]
+            if(argStrings){
+                args.addAll(argStrings)
+            }
+            ExecutionResult result = runSCCommand(args)
+            if(!result.isSuccess()) {
+                failed = true
+                summaryMessage += "Cannot enable service '" + serviceName + "'\n"
+            } else {
+                summaryMessage += "Service '" + serviceName + "' enabled.\n"
+            }
+        }
+
+        // Setting job step summary
+        sr.setJobStepSummary(summaryMessage)
+
+        if(failed) {
+            sr.setJobStepOutcome('error')
+        }
+
         sr.apply()
         log.info("step Enable Service has been finished")
     }
