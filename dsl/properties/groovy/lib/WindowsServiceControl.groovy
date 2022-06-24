@@ -308,11 +308,42 @@ class WindowsServiceControl extends FlowPlugin {
 
         // Calling logger:
         log.info p.asMap.get('serviceNames')
-        
-        // Setting job step summary to the config name
-        sr.setJobStepSummary(p.getParameter('config')?.getValue() ?: 'null')
 
-        sr.setReportUrl("Sample Report", 'https://cloudbees.com')
+        String serviceNames =  p.asMap.get('serviceNames')
+        String[] serviceNamesList = serviceNames.split(',')
+
+        def failed = false
+        def summaryMessage = ''
+
+        for( String  serviceName : serviceNamesList){
+            def args = ['query', serviceName]
+            ExecutionResult result = runSCCommand(args)
+            if(!result.isSuccess()) {
+                failed = true
+                summaryMessage += "Failed to check service '" + serviceName + "' status\n"
+            } else {
+                if(result.getStdOut().contains("RUNNING")){
+                    summaryMessage += "Service '" + serviceName + "' is running.\n"
+                } else if (result.getStdOut().contains("STOPPED")){
+                    failed = true
+                    summaryMessage += "Service '" + serviceName + "' is stopped.\n"
+                } else if (result.getStdOut().contains("PAUSED")){
+                    failed = true
+                    summaryMessage += "Service '" + serviceName + "' is paused.\n"
+                } else {
+                    failed = true
+                    summaryMessage += "Service '" + serviceName + "' status is unrecognized, Exiting with failure.\n"
+                }
+            }
+        }
+
+        // Setting job step summary
+        sr.setJobStepSummary(summaryMessage)
+
+        if(failed) {
+            sr.setJobStepOutcome('error')
+        }
+
         sr.apply()
         log.info("step Check Service Status has been finished")
     }
