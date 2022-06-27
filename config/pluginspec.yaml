@@ -138,7 +138,9 @@ procedures:
     documentation: "Select this to have the step wait for the service to be running."
     required: false
     type: checkbox
-    value: true
+    initiallyChecked: true
+    checkedValue: true
+    uncheckedValue: false
     label: Wait for Started
 -
   name: 'Stop Service'
@@ -157,7 +159,9 @@ procedures:
     documentation: "Select this to have the step wait for the service to be stopped."
     required: false
     type: checkbox
-    value: true
+    initiallyChecked: true
+    checkedValue: true
+    uncheckedValue: false
     label: Wait for Stopped
   -
     name: timeout
