@@ -260,16 +260,78 @@ class WindowsServiceControl extends FlowPlugin {
         log.info p.asMap.get('serviceNames')
         log.info p.asMap.get('argString')
         log.info p.asMap.get('waitFor')
-        
 
-        // Setting job step summary to the config name
-        sr.setJobStepSummary(p.getParameter('config')?.getValue() ?: 'null')
+        String serviceNames =  p.asMap.get('serviceNames')
+        String[] serviceNamesList = serviceNames.split(',')
+        def argString = p.asMap.get('argString')
+        def argStrings = (argString?argString.split('\n'):null)
+        def waitFor = p.asMap.get('waitFor')
 
-        sr.setReportUrl("Sample Report", 'https://cloudbees.com')
+        def failed = false
+        for (String serviceName : serviceNamesList) {
+            if(getServiceStatus(serviceName).equals('RUNNING')){
+                log.info "Service $serviceName already running!"
+            } else {
+                def args = ['start', serviceName]
+                if (argStrings) {
+                    args.addAll(argStrings)
+                }
+                ExecutionResult result = runSCCommand(args)
+                if (!result.isSuccess()) {
+                    log.info "Service $serviceName could not be started!"
+                    failed = true
+                } else if (waitFor && waitFor == "true") {
+                    while(!failed) {
+                        sleep 1000
+                        def currentStatus = getServiceStatus(serviceName)
+                        if(currentStatus == 'RUNNING'){
+                            log.info "Service $serviceName started successfully!"
+                            break
+                        } else if (currentStatus == 'STOPPED') {
+                            log.info "Service $serviceName moved back to stopped state. Check Service log for failures."
+                            failed = true
+                        } else if (currentStatus == 'FAILED') {
+                            failed = true
+                            log.info "unable to check service Status."
+                        } else if (currentStatus == 'UNKNOWN') {
+                            failed = true
+                            log.info "Service $serviceName moved back to unknown state. Check Service log for failures."
+                        }
+                    }
+                }
+            }
+        }
+
+        if(failed) {
+            sr.setJobStepOutcome('error')
+        }
+
         sr.apply()
         log.info("step Start Service has been finished")
     }
 
+    def getServiceStatus(service){
+        def args = ['query', service]
+        ExecutionResult result = runSCCommand(args)
+        if(!result.isSuccess()) {
+            return 'FAILED'
+        } else {
+            def output = result.getStdOut()
+            if(output.contains("RUNNING")){
+                return 'RUNNING'
+            } else if (output.contains("STOPPED")){
+                return 'STOPPED'
+            } else if (output.contains("PAUSED")){
+                return 'PAUSED'
+            } else if (output.contains("START_PENDING")) {
+                return 'START_PENDING'
+            } else if (output.contains("STOP_PENDING")) {
+                return 'STOP_PENDING'
+            } else {
+                return 'UNKNOWN'
+            }
+        }
+    }
 /**
     * stopService - Stop Service/Stop Service
     * Add your code into this method and it will be called when the step runs
